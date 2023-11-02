@@ -27,7 +27,7 @@
                 }
                 else if (unitType == UnitTypes.TERRAN_CYCLONE)
                 {
-                    weapon.Range = 7;
+                    weapon.Range = 6;
                 }
                 else if (unitType == UnitTypes.PROTOSS_COLOSSUS)
                 {
