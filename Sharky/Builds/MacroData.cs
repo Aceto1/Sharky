@@ -65,7 +65,5 @@ namespace Sharky
         public int Minerals { get; set; }
         public int VespeneGas { get; set; }
         public int Frame { get; set; }
-
-
     }
 }

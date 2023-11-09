@@ -140,7 +140,10 @@
                     if (!removedEnemy.Unit.IsHallucination)
                     {
                         ActiveUnitData.EnemyDeaths++;
+                        ActiveUnitData.EnemySupplyLost += (int)removedEnemy.UnitTypeData.FoodRequired;
                         ActiveUnitData.EnemyResourcesLost += (int)removedEnemy.UnitTypeData.MineralCost + (int)removedEnemy.UnitTypeData.VespeneCost;
+                        ActiveUnitData.EnemyMineralsLost += (int)removedEnemy.UnitTypeData.MineralCost;
+                        ActiveUnitData.EnemyVespeneLost += (int)removedEnemy.UnitTypeData.VespeneCost;
                     }
                 }
                 else if (ActiveUnitData.SelfUnits.Remove(tag, out UnitCalculation removedAlly))
@@ -148,7 +151,10 @@
                     if (!removedAlly.Unit.IsHallucination)
                     {
                         ActiveUnitData.SelfDeaths++;
+                        ActiveUnitData.SelfSupplyLost += (int)removedAlly.UnitTypeData.FoodRequired;
                         ActiveUnitData.SelfResourcesLost += (int)removedAlly.UnitTypeData.MineralCost + (int)removedAlly.UnitTypeData.VespeneCost;
+                        ActiveUnitData.SelfMineralsLost += (int)removedAlly.UnitTypeData.MineralCost;
+                        ActiveUnitData.SelfVespeneLost += (int)removedAlly.UnitTypeData.VespeneCost;
                     }
                 }
                 else if (ActiveUnitData.NeutralUnits.Remove(tag, out UnitCalculation removedNeutral))
