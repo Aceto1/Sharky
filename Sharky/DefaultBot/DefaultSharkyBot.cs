@@ -715,12 +715,12 @@
             Managers.Add(BuildManager);
         }
 
-        public SharkyBot CreateBot(List<IManager> managers, DebugService debugService)
+        public virtual SharkyBot CreateBot(List<IManager> managers, DebugService debugService)
         {
             return new SharkyBot(managers, debugService, FrameToTimeConverter, SharkyOptions, PerformanceData, ChatService, TagService);
         }
 
-        public SharkyBot CreateBot()
+        public virtual SharkyBot CreateBot()
         {
             return new SharkyBot(Managers, DebugService, FrameToTimeConverter, SharkyOptions, PerformanceData, ChatService, TagService);
         }

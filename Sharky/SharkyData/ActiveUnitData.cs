@@ -23,10 +23,16 @@
         public List<ulong> DeadUnits { get; set; }
 
         public int EnemyDeaths { get; set; }
+        public int EnemySupplyLost { get; set; }
         public int SelfDeaths { get; set; }
+        public int SelfSupplyLost { get; set; }
         public int NeutralDeaths { get; set; }
 
         public int SelfResourcesLost { get; set; }
+        public int SelfMineralsLost { get; set; }
+        public int SelfVespeneLost { get; set; }
         public int EnemyResourcesLost { get; set; }
+        public int EnemyMineralsLost { get; set; }
+        public int EnemyVespeneLost { get; set; }
     }
 }

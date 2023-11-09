@@ -8,12 +8,13 @@
         string starcraftExe;
         string starcraftDir;
 
-        public void StartSC2Instance(int port)
+        public Process StartSC2Instance(int port)
         {
             var processStartInfo = new ProcessStartInfo(starcraftExe);
             processStartInfo.Arguments = String.Format("-listen {0} -port {1} -displayMode 0", address, port);
             processStartInfo.WorkingDirectory = FilePath.Combine(starcraftDir, "Support64");
-            Process.Start(processStartInfo);
+            processStartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            return Process.Start(processStartInfo);
         }
 
         public async Task Connect(int port, string address = "127.0.0.1")
@@ -315,14 +316,16 @@
             }
         }
 
-        public async Task RunSinglePlayer(ISharkyBot bot, string map, Race myRace, Race opponentRace, Difficulty opponentDifficulty, AIBuild aIBuild, int port = 5678, int randomSeed = -1, string opponentID = "test", bool realTime = false, string botName = "bot")
+        public async Task<Process> RunSinglePlayer(ISharkyBot bot, string map, Race myRace, Race opponentRace, Difficulty opponentDifficulty, AIBuild aIBuild, int port = 5678, int randomSeed = -1, string opponentID = "test", bool realTime = false, string botName = "bot")
         {
             readSettings();
-            StartSC2Instance(port);
+            var process = StartSC2Instance(port);
             await Connect(port);
             await CreateGame(map, opponentRace, opponentDifficulty, aIBuild, randomSeed, realTime);
             var playerId = await JoinGame(myRace);
             await Run(bot, playerId, opponentID, botName);
+
+            return process;
         }
 
         public async Task RunLadder(ISharkyBot bot, Race myRace, int gamePort, int startPort, String opponentID, string botName = "", string address = "127.0.0.1")
