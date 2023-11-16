@@ -36,7 +36,7 @@
 
         protected void SendScvForFirstDepot(int frame)
         {
-            if (MacroData.FoodUsed == 13 && MacroData.Minerals > 80 && UnitCountService.EquivalentTypeCount(UnitTypes.TERRAN_SUPPLYDEPOT) == 0)
+            if (MacroData.FoodUsed == 13 && MacroData.Minerals > 40 && UnitCountService.EquivalentTypeCount(UnitTypes.TERRAN_SUPPLYDEPOT) == 0)
             {
                 if (MapDataService != null && MapDataService.MapData.WallData != null)
                 {
