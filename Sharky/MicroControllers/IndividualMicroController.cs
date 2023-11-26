@@ -140,7 +140,7 @@
                 return false;
             }
 
-            if (AvoidTargettedDamage(commander, target, defensivePoint, frame, out action)) 
+            if (!WeaponReady(commander, frame) && AvoidTargettedDamage(commander, target, defensivePoint, frame, out action)) 
             { 
                 return true; 
             }
@@ -177,7 +177,7 @@
             return false;
         }
 
-        protected virtual float GetMovementSpeed(UnitCommander commander)
+        public virtual float GetMovementSpeed(UnitCommander commander)
         {
             return commander.UnitCalculation.UnitTypeData.MovementSpeed * 1.4f; // always multiply by 1.4f because of gamespeed time conversion
         }
@@ -324,6 +324,8 @@
             UpdateState(commander, defensivePoint, defensivePoint, groupCenter, null, Formation.Normal, frame);
 
             var bestTarget = GetBestTarget(commander, defensivePoint, frame);
+
+            if (ContinueInRangeAttack(commander, frame, out action)) { return action; }
 
             if (PreOffenseOrder(commander, defensivePoint, defensivePoint, groupCenter, bestTarget, frame, out action)) { return action; }
 
@@ -534,7 +536,7 @@
             return false;
         }
 
-        protected virtual bool GetHighGroundVision(UnitCommander commander, Point2D target, Point2D defensivePoint, UnitCalculation bestTarget, int frame, out List<SC2APIProtocol.Action> action)
+        public virtual bool GetHighGroundVision(UnitCommander commander, Point2D target, Point2D defensivePoint, UnitCalculation bestTarget, int frame, out List<SC2APIProtocol.Action> action)
         {
             action = null;
             if (ShouldStayOutOfRange(commander, frame) || MicroPriority == MicroPriority.JustLive || !commander.UnitCalculation.NearbyAllies.Any()) { return false; }
@@ -569,6 +571,7 @@
         protected virtual bool GetHighGroundVisionSupport(UnitCommander commander, Point2D target, Point2D defensivePoint, UnitCalculation bestTarget, UnitCommander targetToSupport, int frame, out List<SC2APIProtocol.Action> action)
         {
             action = null;
+            return false;
 
             if (GetHighGroundVision(commander, target, defensivePoint, bestTarget, frame, out action)) { return true; }
 
@@ -916,7 +919,7 @@
         /// <summary>
         /// if unit has more range and greater or equal range than nearest enemy do not attack unless no units threatening damage, make sure unitsthreateneingdamage is correctly calculated
         /// </summary>
-        protected virtual bool AvoidPointlessDamage(UnitCommander commander, Point2D target, Point2D defensivePoint, Formation formation, int frame, out List<SC2APIProtocol.Action> action)
+        public virtual bool AvoidPointlessDamage(UnitCommander commander, Point2D target, Point2D defensivePoint, Formation formation, int frame, out List<SC2APIProtocol.Action> action)
         {
             action = null;
 
@@ -1006,7 +1009,7 @@
         }
 
 
-        protected virtual bool AvoidDamageList(UnitCommander commander, Point2D target, Point2D defensivePoint, IEnumerable<UnitCalculation> attacks, int frame, bool alwaysRun, out List<SC2APIProtocol.Action> action) // TODO: use unit speed to dynamically adjust AvoidDamageDistance
+        public virtual bool AvoidDamageList(UnitCommander commander, Point2D target, Point2D defensivePoint, IEnumerable<UnitCalculation> attacks, int frame, bool alwaysRun, out List<SC2APIProtocol.Action> action) // TODO: use unit speed to dynamically adjust AvoidDamageDistance
         {
             action = null;
 
@@ -1697,6 +1700,11 @@
 
         public virtual List<SC2APIProtocol.Action> MoveToTarget(UnitCommander commander, Point2D target, int frame)
         {
+            if (!MapDataService.PathWalkable(target))
+            {
+                return commander.Order(frame, Abilities.MOVE, target);
+            }
+
             if (commander.UnitCalculation.NearbyAllies.Any(a => a.Attributes.Contains(SC2APIProtocol.Attribute.Structure)) && Vector2.DistanceSquared(commander.UnitCalculation.Position, target.ToVector2()) > 400)
             {
                 return commander.Order(frame, Abilities.MOVE, target);
@@ -1708,6 +1716,11 @@
 
         protected virtual List<SC2APIProtocol.Action> AttackToTarget(UnitCommander commander, Point2D target, int frame)
         {
+            if (!MapDataService.PathWalkable(target))
+            {
+                return commander.Order(frame, Abilities.ATTACK, target);
+            }
+
             if (!AlwaysUsePathing && commander.UnitCalculation.NearbyAllies.Any(a => a.Attributes.Contains(SC2APIProtocol.Attribute.Structure)) && Vector2.DistanceSquared(commander.UnitCalculation.Position, target.ToVector2()) > 400 && !(commander.UnitRole == UnitRole.Leader && commander.UnitCalculation.NearbyAllies.Any(a => !a.Unit.IsFlying)))
             {
                 return commander.Order(frame, Abilities.ATTACK, target);
@@ -1766,7 +1779,7 @@
             return false;
         }
 
-        protected virtual bool GroupUpBasedOnState(UnitCommander commander, Point2D target, Point2D defensivePoint, Point2D groupCenter, UnitCalculation bestTarget, int frame, out List<SC2APIProtocol.Action> action)
+        public virtual bool GroupUpBasedOnState(UnitCommander commander, Point2D target, Point2D defensivePoint, Point2D groupCenter, UnitCalculation bestTarget, int frame, out List<SC2APIProtocol.Action> action)
         {
             action = null;
             if (commander.CommanderState == CommanderState.Grouping && groupCenter != null)
@@ -1798,7 +1811,7 @@
                     bestTarget.IncomingDamage += GetDamage(commander.UnitCalculation.Weapons, bestTarget.Unit, bestTarget.UnitTypeData);
                     if (WeaponReady(commander, frame))
                     {
-                        if (commander.UnitRole == UnitRole.Leader) { CameraManager.SetCamera(bestTarget.Position); }
+                        if (commander.UnitRole == UnitRole.Leader) { CameraManager.SetCamera(commander.UnitCalculation.Position, bestTarget.Position); }
                         action = commander.Order(frame, Abilities.ATTACK, null, bestTarget.Unit.Tag);
                         commander.LastInRangeAttackFrame = frame;
                     }
@@ -1814,7 +1827,7 @@
                     var bestInRange = GetBestTargetFromList(commander, commander.UnitCalculation.EnemiesInRange.Where(e => e.FrameLastSeen == frame && e.Unit.UnitType != (uint)UnitTypes.PROTOSS_INTERCEPTOR), null);
                     if (bestInRange != null)
                     {
-                        if (commander.UnitRole == UnitRole.Leader) { CameraManager.SetCamera(bestTarget.Position); }
+                        if (commander.UnitRole == UnitRole.Leader) { CameraManager.SetCamera(commander.UnitCalculation.Position, bestTarget.Position); }
                         action = commander.Order(frame, Abilities.ATTACK, null, bestInRange.Unit.Tag);
                         commander.LastInRangeAttackFrame = frame;
                         return true;
@@ -2603,7 +2616,7 @@
             return false;
         }
 
-        protected virtual Point2D GetPositionFromRange(UnitCommander commander, Point target, Point position, float range, float angleOffset = 0)
+        public virtual Point2D GetPositionFromRange(UnitCommander commander, Point target, Point position, float range, float angleOffset = 0)
         {
             return GetPositionFromRange(target.X, target.Y, position.X, position.Y, range, angleOffset);
         }
@@ -3005,7 +3018,7 @@
             return MoveToTarget(commander, target, frame);
         }
 
-        protected virtual UnitCalculation GetBestHarassTarget(UnitCommander commander, Point2D target)
+        public virtual UnitCalculation GetBestHarassTarget(UnitCommander commander, Point2D target)
         {
             var existingAttackOrder = commander.UnitCalculation.Unit.Orders.Where(o => o.AbilityId == (uint)Abilities.ATTACK || o.AbilityId == (uint)Abilities.ATTACK_ATTACK).FirstOrDefault();
 
@@ -3223,7 +3236,7 @@
             return commander.Order(frame, Abilities.ATTACK, target);
         }
 
-        protected virtual bool ContinueInRangeAttack(UnitCommander commander, int frame, out List<SC2APIProtocol.Action> action)
+        public virtual bool ContinueInRangeAttack(UnitCommander commander, int frame, out List<SC2APIProtocol.Action> action)
         {
             action = null;
 

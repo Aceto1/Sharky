@@ -38,6 +38,16 @@
             return null;
         }
 
+        public void SetCamera(Unit unit)
+        {
+            SetCamera(unit.Pos);
+        }
+
+        public void SetCamera(UnitCommander unit)
+        {
+            SetCamera(unit.UnitCalculation.Unit);
+        }
+
         public void SetCamera(Vector2 position)
         {
             SetCamera(position.ToPoint());
@@ -59,6 +69,23 @@
                         CameraMove = new ActionRawCameraMove()
                         {
                             CenterWorldSpace = position
+                        }
+                    }
+                };
+            }
+        }
+
+        public void SetCamera(Vector2 position, Vector2 position2)
+        {
+            if (SharkyOptions.ControlCamera)
+            {
+                CameraAction = new SC2Action
+                {
+                    ActionRaw = new ActionRaw
+                    {
+                        CameraMove = new ActionRawCameraMove()
+                        {
+                            CenterWorldSpace = Vector2.Lerp(position, position2, .5f).ToPoint()
                         }
                     }
                 };

@@ -2,17 +2,17 @@
 {
     public class SharkyBot : ISharkyBot
     {
-        List<IManager> Managers;
-        DebugService DebugService;
-        FrameToTimeConverter FrameToTimeConverter;
-        SharkyOptions SharkyOptions;
-        PerformanceData PerformanceData;
-        ChatService ChatService;
-        TagService TagService;
+        protected List<IManager> Managers;
+        protected DebugService DebugService;
+        protected FrameToTimeConverter FrameToTimeConverter;
+        protected SharkyOptions SharkyOptions;
+        protected PerformanceData PerformanceData;
+        protected ChatService ChatService;
+        protected TagService TagService;
 
-        List<SC2Action> Actions;
+        protected List<SC2Action> Actions;
 
-        DateTime StartTime;
+        protected DateTime StartTime;
 
         public SharkyBot(List<IManager> managers, DebugService debugService, FrameToTimeConverter frameToTimeConverter, SharkyOptions sharkyOptions, PerformanceData performanceData, ChatService chatService, TagService tagService)
         {
@@ -26,7 +26,7 @@
             TagService = tagService;
         }
 
-        public void OnStart(ResponseGameInfo gameInfo, ResponseData data, ResponsePing pingResponse, ResponseObservation observation, uint playerId, string opponentId)
+        public virtual void OnStart(ResponseGameInfo gameInfo, ResponseData data, ResponsePing pingResponse, ResponseObservation observation, uint playerId, string opponentId)
         {
             Console.WriteLine($"Game Version: {pingResponse.GameVersion}");
             var stopwatch = new Stopwatch();
@@ -47,7 +47,7 @@
             StartTime = DateTime.Now;
         }
 
-        public void OnEnd(ResponseObservation observation, Result result)
+        public virtual void OnEnd(ResponseObservation observation, Result result)
         {
             foreach (var manager in Managers)
             {
@@ -68,7 +68,7 @@
 
         }
 
-        public IEnumerable<SC2APIProtocol.Action> OnFrame(ResponseObservation observation)
+        public virtual IEnumerable<SC2APIProtocol.Action> OnFrame(ResponseObservation observation)
         {
             Actions = new List<SC2APIProtocol.Action>();
 
