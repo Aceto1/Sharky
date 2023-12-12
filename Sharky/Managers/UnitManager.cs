@@ -12,6 +12,7 @@
         UnitDataService UnitDataService;
         BaseData BaseData;
         EnemyData EnemyData;
+        EnemyUnitMemoryService EnemyUnitMemoryService;
 
         float NearbyDistance = 18;
         float AvoidRange = 1;
@@ -20,7 +21,7 @@
 
         int TargetPriorityCalculationFrame;
 
-        public UnitManager(ActiveUnitData activeUnitData, SharkyUnitData sharkyUnitData, BaseData baseData, EnemyData enemyData, SharkyOptions sharkyOptions, TargetPriorityService targetPriorityService, CollisionCalculator collisionCalculator, MapDataService mapDataService, DebugService debugService, DamageService damageService, UnitDataService unitDataService)
+        public UnitManager(ActiveUnitData activeUnitData, SharkyUnitData sharkyUnitData, BaseData baseData, EnemyData enemyData, SharkyOptions sharkyOptions, TargetPriorityService targetPriorityService, CollisionCalculator collisionCalculator, MapDataService mapDataService, DebugService debugService, DamageService damageService, UnitDataService unitDataService,EnemyUnitMemoryService enemyUnitMemorService)
         {
             ActiveUnitData = activeUnitData;
 
@@ -34,6 +35,8 @@
             DamageService = damageService;
             UnitDataService = unitDataService;
             EnemyData = enemyData;
+
+            EnemyUnitMemoryService = enemyUnitMemorService;
 
 
             TargetPriorityCalculationFrame = 0;
@@ -57,6 +60,8 @@
 
         public override IEnumerable<SC2APIProtocol.Action> OnFrame(ResponseObservation observation)
         {
+            EnemyUnitMemoryService.ProcessActiveUnitData(ActiveUnitData.EnemyUnits,observation.Observation.GameLoop);
+
             ProcessObservation(observation);
             return null;
         }
@@ -139,6 +144,12 @@
                 {
                     if (!removedEnemy.Unit.IsHallucination)
                     {
+                        UnitTypes type = (UnitTypes) removedEnemy.Unit.UnitType;
+                        if (EnemyUnitMemoryService.CurrentTotalUnits.ContainsKey(type))
+                        {
+                            EnemyUnitMemoryService.UpdateEnemyCount(type, EnemyUnitMemoryService.CurrentTotalUnits[type], observation.Observation.GameLoop);
+                        }
+
                         ActiveUnitData.EnemyDeaths++;
                         ActiveUnitData.EnemySupplyLost += (int)removedEnemy.UnitTypeData.FoodRequired;
                         ActiveUnitData.EnemyResourcesLost += (int)removedEnemy.UnitTypeData.MineralCost + (int)removedEnemy.UnitTypeData.VespeneCost;
