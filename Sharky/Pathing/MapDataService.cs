@@ -186,6 +186,7 @@
             {
                 return false;
             }
+
             return MapData.Map[(int)point.X,(int)point.Y].InSelfVision;
         }
 
