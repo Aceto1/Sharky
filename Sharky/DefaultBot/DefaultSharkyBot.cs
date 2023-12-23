@@ -12,7 +12,7 @@
         public UnitDataManager UnitDataManager { get; set; }
         public MapManager MapManager { get; set; }
         public UnitManager UnitManager { get; set; }
-        public EnemyUnitMemoryService enemyUnitMemoryService { get; set; }
+        public EnemyUnitMemoryService EnemyUnitMemoryService { get; set; }
         public EnemyRaceManager EnemyRaceManager { get; set; }
         public BaseManager BaseManager { get; set; }
         public TargetingManager TargetingManager { get; set; }
@@ -216,8 +216,8 @@
             DamageService = new DamageService();
             BuildingService = new BuildingService(MapData, ActiveUnitData, TargetingData, BaseData, SharkyUnitData);
 
-            enemyUnitMemoryService = new EnemyUnitMemoryService(ActiveUnitData);
-            UnitManager = new UnitManager(ActiveUnitData, SharkyUnitData, BaseData, EnemyData, SharkyOptions, TargetPriorityService, CollisionCalculator, MapDataService, DebugService, DamageService, UnitDataService,enemyUnitMemoryService);
+            EnemyUnitMemoryService = new EnemyUnitMemoryService(ActiveUnitData);
+            UnitManager = new UnitManager(ActiveUnitData, SharkyUnitData, BaseData, EnemyData, SharkyOptions, TargetPriorityService, CollisionCalculator, MapDataService, DebugService, DamageService, UnitDataService, EnemyUnitMemoryService);
             Managers.Add(UnitManager);
 
             HttpClient = new HttpClient();
