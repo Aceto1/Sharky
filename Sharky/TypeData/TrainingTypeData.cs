@@ -8,6 +8,7 @@
         public int Minerals { get; set; }
         public int Gas { get; set; }
         public int Food { get; set; }
+        public int Time { get; set; }
         public bool RequiresTechLab { get; set; }
         public bool IsAddOn { get; set; }
     }

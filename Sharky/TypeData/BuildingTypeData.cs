@@ -6,5 +6,6 @@
         public int Size { get; set; }
         public int Minerals { get; set; }
         public int Gas { get; set; }
+        public int Time { get; set; }
     }
 }
