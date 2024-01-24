@@ -10,6 +10,7 @@
         public ReportingManager ReportingManager { get; set; }
 
         public UnitDataManager UnitDataManager { get; set; }
+        public MapMemoryService MapMemoryService { get; set; }
         public MapManager MapManager { get; set; }
         public UnitManager UnitManager { get; set; }
         public EnemyUnitMemoryService EnemyUnitMemoryService { get; set; }
@@ -230,7 +231,9 @@
 
             WallDataService = new WallDataService(this);
             BaseToBasePathingService = new BaseToBasePathingService(this);
-            MapManager = new MapManager(MapData, ActiveUnitData, SharkyOptions, SharkyUnitData, DebugService, WallDataService);
+
+            MapMemoryService = new MapMemoryService(MapDataService);
+            MapManager = new MapManager(MapData, ActiveUnitData, SharkyOptions, SharkyUnitData, DebugService, WallDataService, MapMemoryService);
             Managers.Add(MapManager);
 
             BaseManager = new BaseManager(SharkyUnitData, ActiveUnitData, SharkyPathFinder, UnitCountService, BaseData, MapDataService);

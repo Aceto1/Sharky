@@ -21,7 +21,7 @@
             LastTotalUnits = new Dictionary<UnitTypes, Dictionary<uint, int>>();
 
             UpdateEnemyCount(UnitTypes.TERRAN_SCV, 12, 1);
-            UpdateEnemyCount(UnitTypes.TERRAN_COMMANDCENTER, 12, 1);
+            UpdateEnemyCount(UnitTypes.TERRAN_COMMANDCENTER, 1, 1);
         }
 
         public void UpdateEnemyCount(UnitTypes type, int newCount, uint frame)
