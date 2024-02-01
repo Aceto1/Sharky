@@ -13,6 +13,7 @@
         public MapMemoryService MapMemoryService { get; set; }
         public MapManager MapManager { get; set; }
         public UnitManager UnitManager { get; set; }
+        public EnemyUnitApproximationService EnemyUnitApproximationService { get; set; }
         public EnemyUnitMemoryService EnemyUnitMemoryService { get; set; }
         public EnemyRaceManager EnemyRaceManager { get; set; }
         public BaseManager BaseManager { get; set; }
@@ -155,17 +156,51 @@
 
             var framesPerSecond = 22.4f;
 
-            SharkyOptions = new SharkyOptions { Debug = debug, DebugMicroTaskUnits = true, FramesPerSecond = framesPerSecond, TagOptions = new TagOptions(), LogPerformance = false, GameStatusReportingEnabled = true, GeneratePathing = false, GeneratePathingPrecision = (10, 10) };
+            SharkyOptions = new SharkyOptions
+            {
+                Debug = debug,
+                DebugMicroTaskUnits = true,
+                FramesPerSecond = framesPerSecond,
+                TagOptions = new TagOptions(),
+                LogPerformance = false,
+                GameStatusReportingEnabled = true,
+                GeneratePathing = false,
+                GeneratePathingPrecision = (10, 10)
+            };
             FrameToTimeConverter = new FrameToTimeConverter(SharkyOptions);
             MacroData = new MacroData();
-            AttackData = new AttackData { ArmyFoodAttack = 30, ArmyFoodRetreat = 25, Attacking = false, UseAttackDataManager = true, CustomAttackFunction = true, RetreatTrigger = 1f, AttackTrigger = 1.5f, RequireDetection = false, ContainBelowKill = true, RequireMaxOut = false, AttackWhenMaxedOut = true, RequireBank = false, RequiredMineralBank = 2000, RequiredVespeneBank = 1000, MaxMineralBankEdgeCase = 10000, AttackWhenOverwhelm = true, GroupUpEnabled = true, ContainTrigger = 1.5f, KillTrigger = 3f };
+            AttackData = new AttackData
+            {
+                ArmyFoodAttack = 30,
+                ArmyFoodRetreat = 25,
+                Attacking = false,
+                UseAttackDataManager = true,
+                CustomAttackFunction = true,
+                RetreatTrigger = 1f,
+                AttackTrigger = 1.5f,
+                RequireDetection = false,
+                ContainBelowKill = true,
+                RequireMaxOut = false,
+                AttackWhenMaxedOut = true,
+                RequireBank = false,
+                RequiredMineralBank = 2000,
+                RequiredVespeneBank = 1000,
+                MaxMineralBankEdgeCase = 10000,
+                AttackWhenOverwhelm = true,
+                GroupUpEnabled = true,
+                ContainTrigger = 1.5f,
+                KillTrigger = 3f
+            };
             TargetingData = new TargetingData { HiddenEnemyBase = false };
             BaseData = new BaseData();
             MapData = new MapData();
             ActiveChatData = new ActiveChatData();
             EnemyData = new EnemyData();
             PerformanceData = new PerformanceData();
-            SharkyUnitData = new SharkyUnitData { CorrosiveBiles = new Dictionary<Point2D, uint>() };
+            SharkyUnitData = new SharkyUnitData
+            {
+                CorrosiveBiles = new Dictionary<Point2D, uint>()
+            };
             ActiveUnitData = new ActiveUnitData();
             MicroTaskData = new MicroTaskData();
 
@@ -174,7 +209,12 @@
             UnitTypeBuildClassifications = new UnitTypeBuildClassifications();
             MapDataService = new MapDataService(MapData);
 
-            MineralWalker = new MineralWalker(BaseData, SharkyUnitData, ActiveUnitData, MapDataService);
+            MineralWalker = new MineralWalker(
+                BaseData,
+                SharkyUnitData,
+                ActiveUnitData,
+                MapDataService
+            );
 
             Managers = new List<IManager>();
 
@@ -183,8 +223,25 @@
             EnemyNameService = new EnemyNameService();
             DebugService = new DebugService(SharkyOptions, ActiveUnitData, MacroData);
             ChatService = new ChatService(this);
-            TagService = new TagService(ChatService, SharkyOptions, VersionService, MacroData, FrameToTimeConverter);
-            DebugManager = new DebugManager(gameConnection, SharkyOptions, DebugService, MapData, TargetingData, ActiveUnitData, EnemyData, ChatService, TagService, SharkyUnitData);
+            TagService = new TagService(
+                ChatService,
+                SharkyOptions,
+                VersionService,
+                MacroData,
+                FrameToTimeConverter
+            );
+            DebugManager = new DebugManager(
+                gameConnection,
+                SharkyOptions,
+                DebugService,
+                MapData,
+                TargetingData,
+                ActiveUnitData,
+                EnemyData,
+                ChatService,
+                TagService,
+                SharkyUnitData
+            );
             Managers.Add(DebugManager);
 
             ReportingManager = new ReportingManager(this);
@@ -197,46 +254,120 @@
             BuildingDataService = new BuildingDataService();
             TrainingDataService = new TrainingDataService();
             AddOnDataService = new AddOnDataService();
-            MorphDataService = new MorphDataService();       
+            MorphDataService = new MorphDataService();
 
-            UnitDataManager = new UnitDataManager(UpgradeDataService, BuildingDataService, TrainingDataService, AddOnDataService, MorphDataService, SharkyUnitData);
+            UnitDataManager = new UnitDataManager(
+                UpgradeDataService,
+                BuildingDataService,
+                TrainingDataService,
+                AddOnDataService,
+                MorphDataService,
+                SharkyUnitData
+            );
             Managers.Add(UnitDataManager);
 
             AreaService = new AreaService(MapDataService);
             TargetPriorityService = new TargetPriorityService(this);
             CollisionCalculator = new CollisionCalculator();
 
-            SharkyPathFinder = new SharkyPathFinder(new Roy_T.AStar.Paths.PathFinder(), MapData, MapDataService, DebugService, ActiveUnitData);
+            SharkyPathFinder = new SharkyPathFinder(
+                new Roy_T.AStar.Paths.PathFinder(),
+                MapData,
+                MapDataService,
+                DebugService,
+                ActiveUnitData
+            );
             SharkySimplePathFinder = new SharkySimplePathFinder(MapDataService);
-            SharkyNearPathFinder = new SharkyNearPathFinder(new Roy_T.AStar.Paths.PathFinder(), MapData, MapDataService, DebugService);
-            SharkyAdvancedPathFinder = new SharkyAdvancedPathFinder(new Roy_T.AStar.Paths.PathFinder(), MapData, MapDataService, DebugService);
+            SharkyNearPathFinder = new SharkyNearPathFinder(
+                new Roy_T.AStar.Paths.PathFinder(),
+                MapData,
+                MapDataService,
+                DebugService
+            );
+            SharkyAdvancedPathFinder = new SharkyAdvancedPathFinder(
+                new Roy_T.AStar.Paths.PathFinder(),
+                MapData,
+                MapDataService,
+                DebugService
+            );
             NoPathFinder = new SharkyNoPathFinder();
 
             RequirementService = new RequirementService(ActiveUnitData, SharkyUnitData);
-            UnitCountService = new UnitCountService(ActiveUnitData, SharkyUnitData, FrameToTimeConverter);
+            UnitCountService = new UnitCountService(
+                ActiveUnitData,
+                SharkyUnitData,
+                FrameToTimeConverter
+            );
             DamageService = new DamageService();
-            BuildingService = new BuildingService(MapData, ActiveUnitData, TargetingData, BaseData, SharkyUnitData);
+            BuildingService = new BuildingService(
+                MapData,
+                ActiveUnitData,
+                TargetingData,
+                BaseData,
+                SharkyUnitData
+            );
 
-            EnemyUnitMemoryService = new EnemyUnitMemoryService(ActiveUnitData);
-            UnitManager = new UnitManager(ActiveUnitData, SharkyUnitData, BaseData, EnemyData, SharkyOptions, TargetPriorityService, CollisionCalculator, MapDataService, DebugService, DamageService, UnitDataService, EnemyUnitMemoryService);
+            EnemyUnitApproximationService = new EnemyUnitApproximationService(SharkyOptions);
+            EnemyUnitMemoryService = new EnemyUnitMemoryService(
+                ActiveUnitData,
+                EnemyUnitApproximationService
+            );
+            UnitManager = new UnitManager(
+                ActiveUnitData,
+                SharkyUnitData,
+                BaseData,
+                EnemyData,
+                SharkyOptions,
+                TargetPriorityService,
+                CollisionCalculator,
+                MapDataService,
+                DebugService,
+                DamageService,
+                UnitDataService,
+                EnemyUnitMemoryService
+            );
             Managers.Add(UnitManager);
 
             HttpClient = new HttpClient();
             EnemyPlayerService = new EnemyPlayerService(EnemyNameService);
-            EnemyRaceManager = new EnemyRaceManager(ActiveUnitData, SharkyUnitData, EnemyData, TagService);
+            EnemyRaceManager = new EnemyRaceManager(
+                ActiveUnitData,
+                SharkyUnitData,
+                EnemyData,
+                TagService
+            );
             Managers.Add(EnemyRaceManager);
 
-            ChokePointService = new ChokePointService(SharkyPathFinder, MapDataService, BuildingService);
+            ChokePointService = new ChokePointService(
+                SharkyPathFinder,
+                MapDataService,
+                BuildingService
+            );
             ChokePointsService = new ChokePointsService(SharkyPathFinder, ChokePointService);
 
             WallDataService = new WallDataService(this);
             BaseToBasePathingService = new BaseToBasePathingService(this);
 
             MapMemoryService = new MapMemoryService(MapDataService);
-            MapManager = new MapManager(MapData, ActiveUnitData, SharkyOptions, SharkyUnitData, DebugService, WallDataService, MapMemoryService);
+            MapManager = new MapManager(
+                MapData,
+                ActiveUnitData,
+                SharkyOptions,
+                SharkyUnitData,
+                DebugService,
+                WallDataService,
+                MapMemoryService
+            );
             Managers.Add(MapManager);
 
-            BaseManager = new BaseManager(SharkyUnitData, ActiveUnitData, SharkyPathFinder, UnitCountService, BaseData, MapDataService);
+            BaseManager = new BaseManager(
+                SharkyUnitData,
+                ActiveUnitData,
+                SharkyPathFinder,
+                UnitCountService,
+                BaseData,
+                MapDataService
+            );
             Managers.Add(BaseManager);
 
             AttackPathingService = new AttackPathingService(this);
@@ -247,42 +378,174 @@
             BuildOptions = new BuildOptions();
             MacroSetup = new MacroSetup();
             WallService = new WallService(this);
-            TerranWallService = new TerranWallService(ActiveUnitData, MapData, BaseData, MacroData, WallService);
-            ProtossWallService = new ProtossWallService(SharkyUnitData, ActiveUnitData, WallService);
-            WallOffPlacement = new HardCodedWallOffPlacement(ActiveUnitData, SharkyUnitData, MapData, BaseData, WallService, TerranWallService, ProtossWallService);
-            ProtossPylonGridPlacement = new ProtossPylonGridPlacement(BaseData, MapDataService, DebugService, BuildingService);
-            ProtossProductionGridPlacement = new ProtossProductionGridPlacement(BaseData, ActiveUnitData, MapDataService, DebugService, BuildingService);
-            TerranProductionGridPlacement = new TerranProductionGridPlacement(BaseData, MapDataService, DebugService, BuildingService);
+            TerranWallService = new TerranWallService(
+                ActiveUnitData,
+                MapData,
+                BaseData,
+                MacroData,
+                WallService
+            );
+            ProtossWallService = new ProtossWallService(
+                SharkyUnitData,
+                ActiveUnitData,
+                WallService
+            );
+            WallOffPlacement = new HardCodedWallOffPlacement(
+                ActiveUnitData,
+                SharkyUnitData,
+                MapData,
+                BaseData,
+                WallService,
+                TerranWallService,
+                ProtossWallService
+            );
+            ProtossPylonGridPlacement = new ProtossPylonGridPlacement(
+                BaseData,
+                MapDataService,
+                DebugService,
+                BuildingService
+            );
+            ProtossProductionGridPlacement = new ProtossProductionGridPlacement(
+                BaseData,
+                ActiveUnitData,
+                MapDataService,
+                DebugService,
+                BuildingService
+            );
+            TerranProductionGridPlacement = new TerranProductionGridPlacement(
+                BaseData,
+                MapDataService,
+                DebugService,
+                BuildingService
+            );
             GatewayCannonPlacement = new GatewayCannonPlacement(this);
             ProtectNexusPylonPlacement = new ProtectNexusPylonPlacement(this);
             ProtectNexusCannonPlacement = new ProtectNexusCannonPlacement(this);
             ProtectNexusBatteryPlacement = new ProtectNexusBatteryPlacement(this);
-            TerranTechGridPlacement = new TerranTechGridPlacement(BaseData, MapDataService, DebugService, BuildingService, TerranProductionGridPlacement);
-            TerranSupplyDepotGridPlacement = new TerranSupplyDepotGridPlacement(BaseData, MapDataService, DebugService, BuildingService);
+            TerranTechGridPlacement = new TerranTechGridPlacement(
+                BaseData,
+                MapDataService,
+                DebugService,
+                BuildingService,
+                TerranProductionGridPlacement
+            );
+            TerranSupplyDepotGridPlacement = new TerranSupplyDepotGridPlacement(
+                BaseData,
+                MapDataService,
+                DebugService,
+                BuildingService
+            );
             MissileTurretPlacement = new MissileTurretPlacement(this);
-            TerranBuildingPlacement = new TerranBuildingPlacement(ActiveUnitData, SharkyUnitData, BaseData, MacroData, DebugService, BuildingService, WallOffPlacement, TerranWallService, TerranSupplyDepotGridPlacement, TerranProductionGridPlacement, TerranTechGridPlacement, MissileTurretPlacement);
+            TerranBuildingPlacement = new TerranBuildingPlacement(
+                ActiveUnitData,
+                SharkyUnitData,
+                BaseData,
+                MacroData,
+                DebugService,
+                BuildingService,
+                WallOffPlacement,
+                TerranWallService,
+                TerranSupplyDepotGridPlacement,
+                TerranProductionGridPlacement,
+                TerranTechGridPlacement,
+                MissileTurretPlacement
+            );
             ProtossDefensiveGridPlacement = new ProtossDefensiveGridPlacement(this);
             ProtossProxyGridPlacement = new ProtossProxyGridPlacement(this);
-            ProtossBuildingPlacement = new ProtossBuildingPlacement(ActiveUnitData, SharkyUnitData, BaseData, DebugService, MapDataService, BuildingService, WallOffPlacement, ProtossPylonGridPlacement, ProtossProductionGridPlacement, ProtectNexusPylonPlacement, TargetingData, ProtectNexusCannonPlacement, BuildOptions, ProtossDefensiveGridPlacement, ProtossProxyGridPlacement);
-            ZergBuildingPlacement = new ZergBuildingPlacement(ActiveUnitData, SharkyUnitData, DebugService, BuildingService);
+            ProtossBuildingPlacement = new ProtossBuildingPlacement(
+                ActiveUnitData,
+                SharkyUnitData,
+                BaseData,
+                DebugService,
+                MapDataService,
+                BuildingService,
+                WallOffPlacement,
+                ProtossPylonGridPlacement,
+                ProtossProductionGridPlacement,
+                ProtectNexusPylonPlacement,
+                TargetingData,
+                ProtectNexusCannonPlacement,
+                BuildOptions,
+                ProtossDefensiveGridPlacement,
+                ProtossProxyGridPlacement
+            );
+            ZergBuildingPlacement = new ZergBuildingPlacement(
+                ActiveUnitData,
+                SharkyUnitData,
+                DebugService,
+                BuildingService
+            );
             ZergGridPlacement = new ZergGridPlacement(this);
             ResourceCenterLocator = new ResourceCenterLocator(this);
-            BuildingPlacement = new BuildingPlacement(ProtossBuildingPlacement, TerranBuildingPlacement, ZergBuildingPlacement, ResourceCenterLocator, BaseData, SharkyUnitData, MacroData, UnitCountService);
+            BuildingPlacement = new BuildingPlacement(
+                ProtossBuildingPlacement,
+                TerranBuildingPlacement,
+                ZergBuildingPlacement,
+                ResourceCenterLocator,
+                BaseData,
+                SharkyUnitData,
+                MacroData,
+                UnitCountService
+            );
             StasisWardPlacement = new StasisWardPlacement(this);
             WorkerBuilderService = new WorkerBuilderService(this);
             SimCityService = new SimCityService(this);
-            BuildingBuilder = new BuildingBuilder(ActiveUnitData, TargetingData, BuildingPlacement, SharkyUnitData, BaseData, MicroTaskData, BuildingService, MapDataService, WorkerBuilderService, AreaService, CameraManager);
+            BuildingBuilder = new BuildingBuilder(
+                ActiveUnitData,
+                TargetingData,
+                BuildingPlacement,
+                SharkyUnitData,
+                BaseData,
+                MicroTaskData,
+                BuildingService,
+                MapDataService,
+                WorkerBuilderService,
+                AreaService,
+                CameraManager
+            );
 
-            WarpInPlacement = new WarpInPlacement(ActiveUnitData, DebugService, MapData, MapDataService, BuildingService);
+            WarpInPlacement = new WarpInPlacement(
+                ActiveUnitData,
+                DebugService,
+                MapData,
+                MapDataService,
+                BuildingService
+            );
             DefaultProducerSelector = new SimpleProducerSelector();
             ZergProducerSelector = new ZergProducerSelector(this);
 
             Morpher = new Morpher(ActiveUnitData, TargetingData);
-            BuildPylonService = new BuildPylonService(MacroData, BuildingBuilder, SharkyUnitData, ActiveUnitData, BaseData, TargetingData, BuildingService, MapDataService);
-            BuildDefenseService = new BuildDefenseService(MacroData, BuildingBuilder, SharkyUnitData, ActiveUnitData, BaseData, TargetingData, BuildOptions, BuildingService, MapDataService);
+            BuildPylonService = new BuildPylonService(
+                MacroData,
+                BuildingBuilder,
+                SharkyUnitData,
+                ActiveUnitData,
+                BaseData,
+                TargetingData,
+                BuildingService,
+                MapDataService
+            );
+            BuildDefenseService = new BuildDefenseService(
+                MacroData,
+                BuildingBuilder,
+                SharkyUnitData,
+                ActiveUnitData,
+                BaseData,
+                TargetingData,
+                BuildOptions,
+                BuildingService,
+                MapDataService
+            );
 
             ChronoData = new ChronoData();
-            NexusManager = new NexusManager(ActiveUnitData, SharkyUnitData, ChronoData, EnemyData, TagService, CameraManager);
+            NexusManager = new NexusManager(
+                ActiveUnitData,
+                SharkyUnitData,
+                ChronoData,
+                EnemyData,
+                TagService,
+                CameraManager
+            );
             Managers.Add(NexusManager);
             ShieldBatteryManager = new ShieldBatteryManager(ActiveUnitData, EnemyData);
             Managers.Add(ShieldBatteryManager);
@@ -292,93 +555,434 @@
             RallyPointManager = new RallyPointManager(this);
             Managers.Add(RallyPointManager);
 
-            OrbitalManager = new OrbitalManager(ActiveUnitData, BaseData, EnemyData, MacroData, UnitCountService, TagService, ChatService, ResourceCenterLocator, MapDataService, SharkyUnitData);
+            OrbitalManager = new OrbitalManager(
+                ActiveUnitData,
+                BaseData,
+                EnemyData,
+                MacroData,
+                UnitCountService,
+                TagService,
+                ChatService,
+                ResourceCenterLocator,
+                MapDataService,
+                SharkyUnitData
+            );
             Managers.Add(OrbitalManager);
             SupplyDepotManager = new SupplyDepotManager(ActiveUnitData, EnemyData, TagService);
             Managers.Add(SupplyDepotManager);
 
-            ChatManager = new ChatManager(HttpClient, ChatHistory, SharkyOptions, ChatDataService, EnemyPlayerService, EnemyNameService, ChatService, ActiveChatData, FrameToTimeConverter, VersionService);
+            ChatManager = new ChatManager(
+                HttpClient,
+                ChatHistory,
+                SharkyOptions,
+                ChatDataService,
+                EnemyPlayerService,
+                EnemyNameService,
+                ChatService,
+                ActiveChatData,
+                FrameToTimeConverter,
+                VersionService
+            );
             Managers.Add(ChatManager);
 
-            ProxyLocationService = new ProxyLocationService(BaseData, TargetingData, SharkyPathFinder, MapDataService, AreaService);
-            TargetingService = new TargetingService(ActiveUnitData, MapDataService, BaseData, TargetingData);
+            ProxyLocationService = new ProxyLocationService(
+                BaseData,
+                TargetingData,
+                SharkyPathFinder,
+                MapDataService,
+                AreaService
+            );
+            TargetingService = new TargetingService(
+                ActiveUnitData,
+                MapDataService,
+                BaseData,
+                TargetingData
+            );
             CreepTumorPlacementFinder = new CreepTumorPlacementFinder(this, SharkyPathFinder);
 
             EnemyAggressivityService = new EnemyAggressivityService(this);
 
-            var individualMicroController = new IndividualMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
+            var individualMicroController = new IndividualMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
 
-            var individualWorkerMicroController = new IndividualWorkerMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
+            var individualWorkerMicroController = new IndividualWorkerMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
 
-            var adeptMicroController = new AdeptMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var adeptShadeMicroController = new AdeptShadeMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var archonMicroController = new ArchonMicroController(this, SharkySimplePathFinder, MicroPriority.AttackForward, false);
-            var colossusMicroController = new ColossusMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var darkTemplarMicroController = new DarkTemplarMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var disruptorMicroController = new DisruptorMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false, SharkyPathFinder);
-            var disruptorPhasedMicroController = new DisruptorPhasedMicroController(this, SharkySimplePathFinder, MicroPriority.AttackForward, false, SharkyPathFinder);
-            var highTemplarMicroController = new HighTemplarMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false);
-            var mothershipMicroController = new MothershipMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false);
-            var immortalMicroController = new ImmortalMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var oracleMicroController = new OracleMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var observerMicroController = new ObserverMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var phoenixMicroController = new PhoenixMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, true);
-            var sentryMicroController = new SentryMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, true);
-            var stalkerMicroController = new StalkerMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var tempestMicroController = new TempestMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var voidrayMicroController = new VoidRayMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var carrierMicroController = new CarrierMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var interceptorMicroController = new InterceptorMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var warpPrismpMicroController = new WarpPrismMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var zealotMicroController = new ZealotMicroController(this, SharkySimplePathFinder, MicroPriority.AttackForward, false);
+            var adeptMicroController = new AdeptMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var adeptShadeMicroController = new AdeptShadeMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var archonMicroController = new ArchonMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.AttackForward,
+                false
+            );
+            var colossusMicroController = new ColossusMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var darkTemplarMicroController = new DarkTemplarMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var disruptorMicroController = new DisruptorMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false,
+                SharkyPathFinder
+            );
+            var disruptorPhasedMicroController = new DisruptorPhasedMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.AttackForward,
+                false,
+                SharkyPathFinder
+            );
+            var highTemplarMicroController = new HighTemplarMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                false
+            );
+            var mothershipMicroController = new MothershipMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                false
+            );
+            var immortalMicroController = new ImmortalMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var oracleMicroController = new OracleMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var observerMicroController = new ObserverMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var phoenixMicroController = new PhoenixMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                true
+            );
+            var sentryMicroController = new SentryMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                true
+            );
+            var stalkerMicroController = new StalkerMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var tempestMicroController = new TempestMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var voidrayMicroController = new VoidRayMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var carrierMicroController = new CarrierMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var interceptorMicroController = new InterceptorMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var warpPrismpMicroController = new WarpPrismMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var zealotMicroController = new ZealotMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.AttackForward,
+                false
+            );
 
-            var zerglingMicroController = new ZerglingMicroController(this, SharkySimplePathFinder, MicroPriority.AttackForward, false);
-            var banelingMicroController = new BanelingMicroController(this, SharkySimplePathFinder, MicroPriority.AttackForward, false);
-            var roachMicroController = new RoachMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false, SharkyUnitData);
-            var ravagerMicroController = new RavagerMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var lurkerMicroController = new LurkerMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var lurkerBurrowedMicroController = new LurkerBurrowedMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var overseerMicroController = new OverseerMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false);
-            var infestorMicroController = new InfestorMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false);
-            var infestorBurrowedMicroController = new InfestorBurrowedMicroController(this, SharkySimplePathFinder, MicroPriority.JustLive, false);
-            var ultraliskMicroController = new UltraliskMicroController(this, SharkySimplePathFinder, MicroPriority.AttackForward, false);
-            var swarmHostMicroController = new SwarmHostMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false);
-            var locustMicroController = new LocustMicroController(this, SharkySimplePathFinder, MicroPriority.AttackForward, false);
-            var corruptorMicroController = new CorruptorMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var broodlordMicroController = new BroodlordMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var viperMicroController = new ViperMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false);
-            var queenMicroController = new QueenMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
+            var zerglingMicroController = new ZerglingMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.AttackForward,
+                false
+            );
+            var banelingMicroController = new BanelingMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.AttackForward,
+                false
+            );
+            var roachMicroController = new RoachMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false,
+                SharkyUnitData
+            );
+            var ravagerMicroController = new RavagerMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var lurkerMicroController = new LurkerMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var lurkerBurrowedMicroController = new LurkerBurrowedMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var overseerMicroController = new OverseerMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                false
+            );
+            var infestorMicroController = new InfestorMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                false
+            );
+            var infestorBurrowedMicroController = new InfestorBurrowedMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.JustLive,
+                false
+            );
+            var ultraliskMicroController = new UltraliskMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.AttackForward,
+                false
+            );
+            var swarmHostMicroController = new SwarmHostMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                false
+            );
+            var locustMicroController = new LocustMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.AttackForward,
+                false
+            );
+            var corruptorMicroController = new CorruptorMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var broodlordMicroController = new BroodlordMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var viperMicroController = new ViperMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                false
+            );
+            var queenMicroController = new QueenMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
 
-            var scvMicroController = new ScvMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var reaperMicroController = new ReaperMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var marineMicroController = new MarineMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var marauderMicroController = new MarauderMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var hellionMicroController = new HellionMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var cycloneMicroController = new CycloneMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false);
-            var siegeTankMicroController = new SiegeTankMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var siegeTankSiegedMicroController = new SiegeTankSiegedMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var thorMicroController = new ThorMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var thorApMicroController = new ThorApMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var vikingMicroController = new VikingMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var vikingLandedMicroController = new VikingLandedMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var bansheeMicroController = new BansheeMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var battleCruiserMicroController = new BattleCruiserMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var ravenMicroController = new RavenMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var medivacMicroController = new MedivacMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var widowMineMicroController = new WidowMineMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var widowMineBurrowedMicroController = new WidowMineBurrowedMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
+            var scvMicroController = new ScvMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var reaperMicroController = new ReaperMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var marineMicroController = new MarineMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var marauderMicroController = new MarauderMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var hellionMicroController = new HellionMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var cycloneMicroController = new CycloneMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.StayOutOfRange,
+                false
+            );
+            var siegeTankMicroController = new SiegeTankMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var siegeTankSiegedMicroController = new SiegeTankSiegedMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var thorMicroController = new ThorMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var thorApMicroController = new ThorApMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var vikingMicroController = new VikingMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var vikingLandedMicroController = new VikingLandedMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var bansheeMicroController = new BansheeMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var battleCruiserMicroController = new BattleCruiserMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var ravenMicroController = new RavenMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var medivacMicroController = new MedivacMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var widowMineMicroController = new WidowMineMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var widowMineBurrowedMicroController = new WidowMineBurrowedMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
 
-            var workerDefenseMicroController = new IndividualMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false, 3);
-            var workerProxyScoutMicroController = new WorkerScoutMicroController(this, SharkyAdvancedPathFinder, MicroPriority.AttackForward, false);
+            var workerDefenseMicroController = new IndividualMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false,
+                3
+            );
+            var workerProxyScoutMicroController = new WorkerScoutMicroController(
+                this,
+                SharkyAdvancedPathFinder,
+                MicroPriority.AttackForward,
+                false
+            );
 
-            var oracleHarassMicroController = new OracleMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
-            var reaperHarassMicroController = new ReaperMicroController(this, SharkySimplePathFinder, MicroPriority.LiveAndAttack, false);
+            var oracleHarassMicroController = new OracleMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
+            var reaperHarassMicroController = new ReaperMicroController(
+                this,
+                SharkySimplePathFinder,
+                MicroPriority.LiveAndAttack,
+                false
+            );
 
             var individualMicroControllers = new Dictionary<UnitTypes, IIndividualMicroController>
             {
                 { UnitTypes.PROTOSS_PROBE, individualWorkerMicroController },
                 { UnitTypes.ZERG_DRONE, individualWorkerMicroController },
-
                 { UnitTypes.PROTOSS_ADEPT, adeptMicroController },
                 { UnitTypes.PROTOSS_ADEPTPHASESHIFT, adeptShadeMicroController },
                 { UnitTypes.PROTOSS_ARCHON, archonMicroController },
@@ -401,7 +1005,6 @@
                 { UnitTypes.PROTOSS_WARPPRISMPHASING, warpPrismpMicroController },
                 { UnitTypes.PROTOSS_ZEALOT, zealotMicroController },
                 { UnitTypes.PROTOSS_OBSERVER, observerMicroController },
-
                 { UnitTypes.ZERG_ZERGLING, zerglingMicroController },
                 { UnitTypes.ZERG_BANELING, banelingMicroController },
                 { UnitTypes.ZERG_ROACH, roachMicroController },
@@ -421,7 +1024,6 @@
                 { UnitTypes.ZERG_BROODLORD, broodlordMicroController },
                 { UnitTypes.ZERG_VIPER, viperMicroController },
                 { UnitTypes.ZERG_QUEEN, queenMicroController },
-
                 { UnitTypes.TERRAN_SCV, scvMicroController },
                 { UnitTypes.TERRAN_REAPER, reaperMicroController },
                 { UnitTypes.TERRAN_MARINE, marineMicroController },
@@ -442,62 +1044,233 @@
                 { UnitTypes.TERRAN_WIDOWMINEBURROWED, widowMineBurrowedMicroController }
             };
 
-            MicroData = new MicroData { IndividualMicroControllers = individualMicroControllers, IndividualMicroController = individualMicroController };
+            MicroData = new MicroData
+            {
+                IndividualMicroControllers = individualMicroControllers,
+                IndividualMicroController = individualMicroController
+            };
 
             DefenseService = new DefenseService(this, TargetPriorityService);
             MicroController = new MicroController(MicroData);
 
-            var defenseSquadTask = new DefenseSquadTask(this, new ArmySplitter(this), new List<DesiredUnitsClaim>(), 0, false);
+            var defenseSquadTask = new DefenseSquadTask(
+                this,
+                new ArmySplitter(this),
+                new List<DesiredUnitsClaim>(),
+                0,
+                false
+            );
             var workerScoutTask = new WorkerScoutTask(this, false, 0.5f);
-            var workerScoutGasStealTask = new WorkerScoutGasStealTask(this, false, 0.5f, workerDefenseMicroController);
+            var workerScoutGasStealTask = new WorkerScoutGasStealTask(
+                this,
+                false,
+                0.5f,
+                workerDefenseMicroController
+            );
             var reaperScoutTask = new ReaperScoutTask(this, false, 0.5f);
-            var findHiddenBaseTask = new FindHiddenBaseTask(BaseData, TargetingData, MapDataService, individualMicroController, 15, false, 0.5f);
-            var proxyScoutTask = new ProxyScoutTask(this, false, 0.5f, workerProxyScoutMicroController);
+            var findHiddenBaseTask = new FindHiddenBaseTask(
+                BaseData,
+                TargetingData,
+                MapDataService,
+                individualMicroController,
+                15,
+                false,
+                0.5f
+            );
+            var proxyScoutTask = new ProxyScoutTask(
+                this,
+                false,
+                0.5f,
+                workerProxyScoutMicroController
+            );
             var miningDefenseService = new MiningDefenseService(this, workerDefenseMicroController);
-            var miningTask = new MiningTask(this, 1, miningDefenseService, new MineralMiner(this), new GasMiner(this));
+            var miningTask = new MiningTask(
+                this,
+                1,
+                miningDefenseService,
+                new MineralMiner(this),
+                new GasMiner(this)
+            );
             var queenInjectTask = new QueenInjectTask(this, 1.0f, queenMicroController, false);
             var queenCreepTask = new QueenCreepTask(this, 1.1f, queenMicroController, false);
             var changelingScout = new ChangelingScoutTask(this, false, 0.25f);
             var queenDefendTask = new QueenDefendTask(this, 1.1f, queenMicroController, false);
-            var burrowBlockExpansions = new BurrowBlockExpansionsTask(this, 0.9f, new IndividualMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false), SharkyUnitData, false);
+            var burrowBlockExpansions = new BurrowBlockExpansionsTask(
+                this,
+                0.9f,
+                new IndividualMicroController(
+                    this,
+                    SharkySimplePathFinder,
+                    MicroPriority.StayOutOfRange,
+                    false
+                ),
+                SharkyUnitData,
+                false
+            );
             var burrowDronesFromHarras = new BurrowDronesFromHarras(this, 0.5f, false);
             var creepTumorTask = new CreepTumorTask(this, 1.11f, false);
-            var attackTask = new AttackTask(MicroController, TargetingData, ActiveUnitData, DefenseService, MacroData, AttackData, TargetingService, MicroTaskData, SharkyUnitData, new ArmySplitter(this), new EnemyCleanupService(MicroController, DamageService), 2);
-            var adeptWorkerHarassTask = new AdeptWorkerHarassTask(BaseData, TargetingData, adeptMicroController, adeptShadeMicroController, false);
-            var oracleWorkerHarassTask = new OracleWorkerHarassTask(this, oracleHarassMicroController, 1, false);
-            var lateGameOracleHarassTask = new LateGameOracleHarassTask(BaseData, TargetingData, MapDataService, oracleHarassMicroController, 1, false);
-            var reaperWorkerHarassTask = new ReaperWorkerHarassTask(this, reaperHarassMicroController, 2, false);
+            var attackTask = new AttackTask(
+                MicroController,
+                TargetingData,
+                ActiveUnitData,
+                DefenseService,
+                MacroData,
+                AttackData,
+                TargetingService,
+                MicroTaskData,
+                SharkyUnitData,
+                new ArmySplitter(this),
+                new EnemyCleanupService(MicroController, DamageService),
+                2
+            );
+            var adeptWorkerHarassTask = new AdeptWorkerHarassTask(
+                BaseData,
+                TargetingData,
+                adeptMicroController,
+                adeptShadeMicroController,
+                false
+            );
+            var oracleWorkerHarassTask = new OracleWorkerHarassTask(
+                this,
+                oracleHarassMicroController,
+                1,
+                false
+            );
+            var lateGameOracleHarassTask = new LateGameOracleHarassTask(
+                BaseData,
+                TargetingData,
+                MapDataService,
+                oracleHarassMicroController,
+                1,
+                false
+            );
+            var reaperWorkerHarassTask = new ReaperWorkerHarassTask(
+                this,
+                reaperHarassMicroController,
+                2,
+                false
+            );
             var bansheeHarassTask = new BansheeHarassTask(this, bansheeMicroController, 2, false);
-            var hellionHarassTask = new HellionHarassTask(this, false, -.9f, hellionMicroController, reaperHarassMicroController);
-            var hellionExpansionScoutTask = new HellionExpansionScoutTask(this, false, -.9f, hellionMicroController, reaperHarassMicroController);
-            var siegeTankAtPlanetaryTask = new SiegeTankAtPlanetaryTask(this, siegeTankMicroController, siegeTankSiegedMicroController, false, .5f);
-            var hallucinationScoutTask = new HallucinationScoutTask(TargetingData, BaseData, MicroTaskData, false, .5f);
-            var hallucinationScoutEmptyBasesTask = new HallucinationScoutEmptyBasesTask(this, false, .51f);
-            var wallOffTask = new WallOffTask(SharkyUnitData, ActiveUnitData, MacroData, MapData, WallService, ChatService, false, .25f);
-            var permanentWallOffTask = new PermanentWallOffTask(SharkyUnitData, ActiveUnitData, MacroData, MapData, WallService, ChatService, false, .25f);
+            var hellionHarassTask = new HellionHarassTask(
+                this,
+                false,
+                -.9f,
+                hellionMicroController,
+                reaperHarassMicroController
+            );
+            var hellionExpansionScoutTask = new HellionExpansionScoutTask(
+                this,
+                false,
+                -.9f,
+                hellionMicroController,
+                reaperHarassMicroController
+            );
+            var siegeTankAtPlanetaryTask = new SiegeTankAtPlanetaryTask(
+                this,
+                siegeTankMicroController,
+                siegeTankSiegedMicroController,
+                false,
+                .5f
+            );
+            var hallucinationScoutTask = new HallucinationScoutTask(
+                TargetingData,
+                BaseData,
+                MicroTaskData,
+                false,
+                .5f
+            );
+            var hallucinationScoutEmptyBasesTask = new HallucinationScoutEmptyBasesTask(
+                this,
+                false,
+                .51f
+            );
+            var wallOffTask = new WallOffTask(
+                SharkyUnitData,
+                ActiveUnitData,
+                MacroData,
+                MapData,
+                WallService,
+                ChatService,
+                false,
+                .25f
+            );
+            var permanentWallOffTask = new PermanentWallOffTask(
+                SharkyUnitData,
+                ActiveUnitData,
+                MacroData,
+                MapData,
+                WallService,
+                ChatService,
+                false,
+                .25f
+            );
             var fullPylonWallOffTask = new FullPylonWallOffTask(this, false, .25f);
             var destroyWallOffTask = new DestroyWallOffTask(ActiveUnitData, false, .25f);
             var prePositionBuilderTask = new PrePositionBuilderTask(this, .25f);
             var repairTask = new RepairTask(this, .6f, true);
-            var saveLiftableBuildingTask = new SaveLiftableBuildingTask(this, BuildingPlacement, .6f, true);
+            var saveLiftableBuildingTask = new SaveLiftableBuildingTask(
+                this,
+                BuildingPlacement,
+                .6f,
+                true
+            );
             var hellbatMorphTask = new HellbatMorphTask(this, false, 0.5f);
             var salvageMainBunkerTask = new SalvageMainBunkerTask(this, false, 0.5f);
             var nexusRecallTask = new NexusRecallTask(this, false, 0.5f);
-            var forceFieldRampTask = new ForceFieldRampTask(TargetingData, ActiveUnitData, MapData, WallService, MapDataService, false, 0.5f);
+            var forceFieldRampTask = new ForceFieldRampTask(
+                TargetingData,
+                ActiveUnitData,
+                MapData,
+                WallService,
+                MapDataService,
+                false,
+                0.5f
+            );
             var denyExpansionsTask = new DenyExpansionsTask(this, false, 1.1f);
-            var darkTemplarHarassTask = new DarkTemplarHarassTask(BaseData, TargetingData, MapDataService, darkTemplarMicroController, 2, false);
+            var darkTemplarHarassTask = new DarkTemplarHarassTask(
+                BaseData,
+                TargetingData,
+                MapDataService,
+                darkTemplarMicroController,
+                2,
+                false
+            );
             var defensiveZealotWarpInTask = new DefensiveZealotWarpInTask(this, false, .5f);
-            var defensiveStalkerZealotWarpInTask = new DefensiveStalkerZealotWarpInTask(this, false, .49f);
+            var defensiveStalkerZealotWarpInTask = new DefensiveStalkerZealotWarpInTask(
+                this,
+                false,
+                .49f
+            );
             var reaperMiningDefenseTask = new ReaperMiningDefenseTask(this, true, .5f);
             var cannonRushDefenseTask = new CannonRushDefenseTask(this, true, .5f);
             var overlordScoutTask = new OverlordScoutTask(this, true, 0.9f);
-            var overlordProxyScoutTask = new SecondaryOverlordScoutingTask(this, true, 1.0f, new IndividualMicroController(this, SharkySimplePathFinder, MicroPriority.StayOutOfRange, false));
+            var overlordProxyScoutTask = new SecondaryOverlordScoutingTask(
+                this,
+                true,
+                1.0f,
+                new IndividualMicroController(
+                    this,
+                    SharkySimplePathFinder,
+                    MicroPriority.StayOutOfRange,
+                    false
+                )
+            );
             var zerglingScoutTask = new ZerglingScoutTask(this, false, 1.0f);
             var scoutForSpineTask = new ScoutForSpineTask(this, false, 0.5f);
             var protossDoorTask = new ProtossDoorTask(this, false, -0.5f);
             var zealotHarassTask = new ZealotHarassTask(this, false, 0.5f, zealotMicroController);
-            var clearFutureExpansionTask = new ClearFutureExpansionTask(this, new List<DesiredUnitsClaim>(), -0.1f, false);
-            var bunkerReadyToRepairTask = new BunkerReadyToRepairTask(this, workerDefenseMicroController, false, 0.1f);
+            var clearFutureExpansionTask = new ClearFutureExpansionTask(
+                this,
+                new List<DesiredUnitsClaim>(),
+                -0.1f,
+                false
+            );
+            var bunkerReadyToRepairTask = new BunkerReadyToRepairTask(
+                this,
+                workerDefenseMicroController,
+                false,
+                0.1f
+            );
 
             MicroTaskData[defenseSquadTask.GetType().Name] = defenseSquadTask;
             MicroTaskData[workerScoutGasStealTask.GetType().Name] = workerScoutGasStealTask;
@@ -520,7 +1293,8 @@
             MicroTaskData[hellionExpansionScoutTask.GetType().Name] = hellionExpansionScoutTask;
             MicroTaskData[siegeTankAtPlanetaryTask.GetType().Name] = siegeTankAtPlanetaryTask;
             MicroTaskData[hallucinationScoutTask.GetType().Name] = hallucinationScoutTask;
-            MicroTaskData[hallucinationScoutEmptyBasesTask.GetType().Name] = hallucinationScoutEmptyBasesTask;
+            MicroTaskData[hallucinationScoutEmptyBasesTask.GetType().Name] =
+                hallucinationScoutEmptyBasesTask;
             MicroTaskData[wallOffTask.GetType().Name] = wallOffTask;
             MicroTaskData[permanentWallOffTask.GetType().Name] = permanentWallOffTask;
             MicroTaskData[fullPylonWallOffTask.GetType().Name] = fullPylonWallOffTask;
@@ -535,7 +1309,8 @@
             MicroTaskData[denyExpansionsTask.GetType().Name] = denyExpansionsTask;
             MicroTaskData[darkTemplarHarassTask.GetType().Name] = darkTemplarHarassTask;
             MicroTaskData[defensiveZealotWarpInTask.GetType().Name] = defensiveZealotWarpInTask;
-            MicroTaskData[defensiveStalkerZealotWarpInTask.GetType().Name] = defensiveStalkerZealotWarpInTask;
+            MicroTaskData[defensiveStalkerZealotWarpInTask.GetType().Name] =
+                defensiveStalkerZealotWarpInTask;
             MicroTaskData[reaperMiningDefenseTask.GetType().Name] = reaperMiningDefenseTask;
             MicroTaskData[cannonRushDefenseTask.GetType().Name] = cannonRushDefenseTask;
             MicroTaskData[overlordScoutTask.GetType().Name] = overlordScoutTask;
@@ -550,20 +1325,49 @@
             MicroTaskData[changelingScout.GetType().Name] = changelingScout;
             MicroTaskData[bunkerReadyToRepairTask.GetType().Name] = bunkerReadyToRepairTask;
 
-            MicroManager = new MicroManager(ActiveUnitData, MicroTaskData, SharkyOptions, DebugService);
+            MicroManager = new MicroManager(
+                ActiveUnitData,
+                MicroTaskData,
+                SharkyOptions,
+                DebugService
+            );
             Managers.Add(MicroManager);
 
-            AttackDataManager = new AttackDataManager(AttackData, ActiveUnitData, attackTask, TargetPriorityService, TargetingData, MacroData, BaseData, DebugService);
+            AttackDataManager = new AttackDataManager(
+                AttackData,
+                ActiveUnitData,
+                attackTask,
+                TargetPriorityService,
+                TargetingData,
+                MacroData,
+                BaseData,
+                DebugService
+            );
             Managers.Add(AttackDataManager);
 
             BuildProxyService = new BuildProxyService(this);
-            BuildAddOnSwapService = new BuildAddOnSwapService(MacroData, ActiveUnitData, SharkyUnitData, BuildingService, BuildingPlacement);
+            BuildAddOnSwapService = new BuildAddOnSwapService(
+                MacroData,
+                ActiveUnitData,
+                SharkyUnitData,
+                BuildingService,
+                BuildingPlacement
+            );
             BuildingCancelService = new BuildingCancelService(ActiveUnitData, MacroData);
             UpgradeRequestCancellingService = new UpgradeRequestCancellingService(this);
             UnitRequestCancellingService = new UnitRequestCancellingService(this);
-            BuildingRequestCancellingService = new BuildingRequestCancellingService(ActiveUnitData, MacroData, UnitCountService);
+            BuildingRequestCancellingService = new BuildingRequestCancellingService(
+                ActiveUnitData,
+                MacroData,
+                UnitCountService
+            );
             VespeneGasBuilder = new VespeneGasBuilder(this, BuildingBuilder);
-            UnitBuilder = new UnitBuilder(this, WarpInPlacement, DefaultProducerSelector, ZergProducerSelector);
+            UnitBuilder = new UnitBuilder(
+                this,
+                WarpInPlacement,
+                DefaultProducerSelector,
+                ZergProducerSelector
+            );
             UpgradeResearcher = new UpgradeResearcher(this);
             SupplyBuilder = new SupplyBuilder(this, BuildingBuilder);
             ProductionBuilder = new ProductionBuilder(this, BuildingBuilder);
@@ -589,7 +1393,9 @@
 
                 [nameof(AdeptRush)] = new AdeptRush(this),
                 [nameof(CannonRush)] = new CannonRush(this),
-                [nameof(EnemyStrategies.Protoss.FourGate)] = new EnemyStrategies.Protoss.FourGate(this),
+                [nameof(EnemyStrategies.Protoss.FourGate)] = new EnemyStrategies.Protoss.FourGate(
+                    this
+                ),
                 [nameof(ProtossFastExpand)] = new ProtossFastExpand(this),
                 [nameof(ProxyRobo)] = new ProxyRobo(this),
                 [nameof(ProxyStargate)] = new ProxyStargate(this),
@@ -710,12 +1516,37 @@
                 ["Transition"] = zergSequences
             };
 
-            MacroBalancer = new MacroBalancer(BuildOptions, ActiveUnitData, MacroData, SharkyUnitData, BaseData, UnitCountService, SharkyOptions);
+            MacroBalancer = new MacroBalancer(
+                BuildOptions,
+                ActiveUnitData,
+                MacroData,
+                SharkyUnitData,
+                BaseData,
+                UnitCountService,
+                SharkyOptions
+            );
             BuildChoices = new Dictionary<Race, BuildChoices>
             {
-                { Race.Protoss, new BuildChoices { Builds = protossBuilds, BuildSequences = protossBuildSequences } },
-                { Race.Terran, new BuildChoices { Builds = terranBuilds, BuildSequences = terranBuildSequences } },
-                { Race.Zerg, new BuildChoices { Builds = zergBuilds, BuildSequences = zergBuildSequences } }
+                {
+                    Race.Protoss,
+                    new BuildChoices
+                    {
+                        Builds = protossBuilds,
+                        BuildSequences = protossBuildSequences
+                    }
+                },
+                {
+                    Race.Terran,
+                    new BuildChoices
+                    {
+                        Builds = terranBuilds,
+                        BuildSequences = terranBuildSequences
+                    }
+                },
+                {
+                    Race.Zerg,
+                    new BuildChoices { Builds = zergBuilds, BuildSequences = zergBuildSequences }
+                }
             };
             BuildMatcher = new BuildMatcher();
             RecordService = new RecordService(BuildMatcher);
@@ -726,12 +1557,28 @@
 
         public virtual SharkyBot CreateBot(List<IManager> managers, DebugService debugService)
         {
-            return new SharkyBot(managers, debugService, FrameToTimeConverter, SharkyOptions, PerformanceData, ChatService, TagService);
+            return new SharkyBot(
+                managers,
+                debugService,
+                FrameToTimeConverter,
+                SharkyOptions,
+                PerformanceData,
+                ChatService,
+                TagService
+            );
         }
 
         public virtual SharkyBot CreateBot()
         {
-            return new SharkyBot(Managers, DebugService, FrameToTimeConverter, SharkyOptions, PerformanceData, ChatService, TagService);
+            return new SharkyBot(
+                Managers,
+                DebugService,
+                FrameToTimeConverter,
+                SharkyOptions,
+                PerformanceData,
+                ChatService,
+                TagService
+            );
         }
     }
 }
