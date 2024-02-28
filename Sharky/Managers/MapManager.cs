@@ -3,21 +3,23 @@
     public class MapManager : SharkyManager
     {
         ActiveUnitData ActiveUnitData;
-        MapData MapData;
+         MapData MapData;
         SharkyUnitData SharkyUnitData;
         DebugService DebugService;
         WallDataService WallDataService;
+        MapMemoryService MapMemoryService;
 
         private int LastUpdateFrame;
         private readonly int FramesPerUpdate;
 
-        public MapManager(MapData mapData, ActiveUnitData activeUnitData, SharkyOptions sharkyOptions, SharkyUnitData sharkyUnitData, DebugService debugService, WallDataService wallDataService)
+        public MapManager(MapData mapData, ActiveUnitData activeUnitData, SharkyOptions sharkyOptions, SharkyUnitData sharkyUnitData, DebugService debugService, WallDataService wallDataService, MapMemoryService mapMemoryService)
         {
             MapData = mapData;
             ActiveUnitData = activeUnitData;
             SharkyUnitData = sharkyUnitData;
             DebugService = debugService;
             WallDataService = wallDataService;
+            MapMemoryService = mapMemoryService;
 
             FramesPerUpdate = 5;
             LastUpdateFrame = -100;
@@ -397,6 +399,9 @@
                 {
                     MapData.Map[x,y].InSelfVision = GetDataValueByte(visiblilityMap, x, y) == 2; // 2 is fully visible
                     MapData.Map[x,y].Visibility = GetDataValueByte(visiblilityMap, x, y);
+
+                    MapMemoryService.ProcessVisibility(GetDataValueByte(visiblilityMap, x, y), (uint) frame);
+
                     if (GetDataValueByte(visiblilityMap, x, y) == 2)
                     {
                         MapData.Map[x,y].LastFrameVisibility = frame;

@@ -6,6 +6,7 @@
     public class EnemyUnitMemoryService
     {
         private ActiveUnitData activeUnitData;
+        private EnemyUnitApproximationService enemeyUnitApproximationService;
         public Dictionary<UnitTypes, int> CurrentTotalUnits { get; }
 
         /// <summary>
@@ -13,15 +14,19 @@
         /// </summary>
         public Dictionary<UnitTypes, Dictionary<uint, int>> LastTotalUnits { get; }
 
-        public EnemyUnitMemoryService(ActiveUnitData activeUnitData)
+        public EnemyUnitMemoryService(
+            ActiveUnitData activeUnitData,
+            EnemyUnitApproximationService enemyUnitApproximationService
+        )
         {
             this.activeUnitData = activeUnitData;
+            this.enemeyUnitApproximationService = enemyUnitApproximationService;
 
             CurrentTotalUnits = new Dictionary<UnitTypes, int>();
             LastTotalUnits = new Dictionary<UnitTypes, Dictionary<uint, int>>();
 
             UpdateEnemyCount(UnitTypes.TERRAN_SCV, 12, 1);
-            UpdateEnemyCount(UnitTypes.TERRAN_COMMANDCENTER, 12, 1);
+            UpdateEnemyCount(UnitTypes.TERRAN_COMMANDCENTER, 1, 1);
         }
 
         public void UpdateEnemyCount(UnitTypes type, int newCount, uint frame)
@@ -34,9 +39,14 @@
 
             value[frame] = newCount;
             CurrentTotalUnits[type] = newCount;
+
+            enemeyUnitApproximationService.UpdateEnemyApproximation(type, value);
         }
 
-        public void ProcessActiveUnitData(Dictionary<ulong, UnitCalculation> currentEnemyCount, uint frame)
+        public void ProcessActiveUnitData(
+            Dictionary<ulong, UnitCalculation> currentEnemyCount,
+            uint frame
+        )
         {
             var typeCounts = new Dictionary<UnitTypes, int>();
 

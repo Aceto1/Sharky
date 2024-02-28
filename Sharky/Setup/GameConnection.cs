@@ -73,7 +73,7 @@
         private void readSettings()
         {
             var myDocuments = Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
-            var executeInfo = FilePath.Combine(myDocuments, "Starcraft II", "ExecuteInfo.txt");
+            var executeInfo = FilePath.Combine(myDocuments, "..", "Library", "Application Support", "Blizzard", "Starcraft II", "ExecuteInfo.txt");
             if (File.Exists(executeInfo))
             {
                 var lines = File.ReadAllLines(executeInfo);
