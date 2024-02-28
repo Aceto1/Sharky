@@ -1,4 +1,6 @@
-﻿namespace Sharky
+﻿using System.Runtime.InteropServices;
+
+namespace Sharky
 {
     public class GameConnection
     {
@@ -73,7 +75,13 @@
         private void readSettings()
         {
             var myDocuments = Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
-            var executeInfo = FilePath.Combine(myDocuments, "..", "Library", "Application Support", "Blizzard", "Starcraft II", "ExecuteInfo.txt");
+            
+            string executeInfo;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                executeInfo = FilePath.Combine(myDocuments, "..", "Library", "Application Support", "Blizzard", "Starcraft II", "ExecuteInfo.txt");
+            else
+                executeInfo = FilePath.Combine(myDocuments, "Starcraft II", "ExecuteInfo.txt");
+
             if (File.Exists(executeInfo))
             {
                 var lines = File.ReadAllLines(executeInfo);
